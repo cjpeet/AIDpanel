@@ -1,0 +1,1125 @@
+#Download gnomad CSV file for ADA2 and ensure saved to chosen directory with name \{genename}.MAF.csv
+#Open R
+#Load dplyr package
+library(dplyr)
+
+#Open MAFs
+ADA2.MAF <- read.csv("ADA2.MAF.csv", header = TRUE)
+IL1RN.MAF <- read.csv("IL1RN.MAF.csv", header = TRUE)
+IL36RN.MAF <- read.csv("IL36RN.MAF.csv", header = TRUE)
+CARD14.MAF <- read.csv("CARD14.MAF.csv", header = TRUE)
+LPIN2.MAF <- read.csv("LPIN2.MAF.csv", header = TRUE)
+MEFV.MAF <- read.csv("MEFV.MAF.csv", header = TRUE)
+MVK.MAF <- read.csv("MVK.MAF.csv", header = TRUE)
+NLRC4.MAF <- read.csv("NLRC4.MAF.csv", header = TRUE)
+NLRP3.MAF <- read.csv("NLRP3.MAF.csv", header = TRUE)
+NLRP12.MAF <- read.csv("NLRP12.MAF.csv", header = TRUE)
+NOD2.MAF <- read.csv("NOD2.MAF.csv", header = TRUE)
+PLCG2.MAF <- read.csv("PLCG2.MAF.csv", header = TRUE)
+PSTPIP1.MAF <- read.csv("PSTPIP1.MAF.csv", header = TRUE)
+PSMB4.MAF <- read.csv("PSMB4.MAF.csv", header = TRUE)
+PSMB8.MAF <- read.csv("PSMB8.MAF.csv", header = TRUE)
+PSMB9.MAF <- read.csv("PSMB9.MAF.csv", header = TRUE)
+SH3BP2.MAF <- read.csv("SH3BP2.MAF.csv", header = TRUE)
+TMEM173.MAF <- read.csv("TMEM173.MAF.csv", header = TRUE)
+TNFAIP3.MAF <- read.csv("TNFAIP3.MAF.csv", header = TRUE)
+TNFRSF1A.MAF <- read.csv("TNFRSF1A.MAF.csv", header = TRUE)
+OTULIN.MAF <- read.csv("OTULIN.MAF.csv", header = TRUE)
+RBCK1.MAF <- read.csv("RBCK1.MAF.csv", header = TRUE)
+SLC29A3.MAF <- read.csv("SLC29A3.MAF.csv", header = TRUE)
+UBA1.MAF <- read.csv("UBA1.MAF.csv", header = TRUE)
+
+ADA2.MAF$Gene <- c('ADA2')
+CARD14.MAF$Gene <- c('CARD14')
+IL1RN.MAF$Gene <- c('IL1RN')
+IL36RN.MAF$Gene <- c('IL36RN')
+LPIN2.MAF$Gene <- c('LPIN2')
+MEFV.MAF$Gene <- c('MEFV')
+MVK.MAF$Gene <- c('MVK')
+NLRC4.MAF$Gene <- c('NLRC4')
+NLRP3.MAF$Gene <- c('NLRP3')
+NLRP12.MAF$Gene <- c('NLRP12')
+NOD2.MAF$Gene <- c('NOD2')
+PLCG2.MAF$Gene <- c('PLCG2')
+PSMB4.MAF$Gene <- c('PSMB4')
+PSMB8.MAF$Gene <- c('PSMB8')
+PSMB9.MAF$Gene <- c('PSMB9')
+PSTPIP1.MAF$Gene <- c('PSTPIP1')
+SH3BP2.MAF$Gene <- c('SH3BP2')
+TMEM173.MAF$Gene <- c('TMEM173')
+TNFAIP3.MAF$Gene <- c('TNFAIP3')
+TNFRSF1A.MAF$Gene <- c('TNFRSF1A')
+OTULIN.MAF$Gene <- c('OTULIN')
+RBCK1.MAF$Gene <- c('RBCK1')
+SLC29A3.MAF$Gene <- c('SLC29A3')
+UBA1.MAF$Gene <- c('UBA1')
+
+#Merge into single dataframe
+MAF <- rbind(ADA2.MAF,CARD14.MAF,IL1RN.MAF,IL36RN.MAF,LPIN2.MAF,MEFV.MAF,MVK.MAF,NLRC4.MAF, NLRP3.MAF, NLRP12.MAF, NOD2.MAF, PLCG2.MAF, PSMB4.MAF, PSMB8.MAF, PSMB9.MAF, PSTPIP1.MAF, SH3BP2.MAF, TMEM173.MAF, TNFAIP3.MAF, TNFRSF1A.MAF, OTULIN.MAF, RBCK1.MAF, SLC29A3.MAF,UBA1.MAF)
+
+#Create vector with MAF column names
+MAF.col <- c('Chromosome','Position','rsIDs','Reference','Alternate','Source','Filters - exomes','Filters - genomes','Transcript','HGVS Consequence','Protein Consequence','Transcript Consequence','VEP Annotation','ClinVar Clinical Significance','ClinVar Variation ID','Flags','Allele Count','Allele Number','Allele Frequency','Homozygote Count','Hemizygote Count','Allele Count African/African American','Allele Number African/African American','Homozygote Count African/African American','Hemizygote Count African/African American','Allele Count Latino/Admixed American','Allele Number Latino/Admixed American','Homozygote Count Latino/Admixed American','Hemizygote Count Latino/Admixed American','Allele Count Ashkenazi Jewish','Allele Number Ashkenazi Jewish','Homozygote Count Ashkenazi Jewish','Hemizygote Count Ashkenazi Jewish','Allele Count East Asian','Allele Number East Asian','Homozygote Count East Asian','Hemizygote Count East Asian','Allele Count European (Finnish)','Allele Number European (Finnish)','Homozygote Count European (Finnish)','Hemizygote Count European (Finnish)','Allele Count European (non-Finnish)','Allele Number European (non-Finnish)','Homozygote Count European (non-Finnish)','Hemizygote Count European (non-Finnish)','Allele Count Other','Allele Number Other','Homozygote Count Other','Hemizygote Count Other','Allele Count South Asian','Allele Number South Asian','Homozygote Count South Asian','Hemizygote Count South Asian')
+
+#Filter for non synonymous and splice site variants
+MAF.coding <- MAF %>% filter(VEP.Annotation != '3_prime_UTR_variant' & VEP.Annotation != '5_prime_UTR_variant' & VEP.Annotation != 'intron_variant' & VEP.Annotation != 'synonymous_variant')
+
+#Create ethnicity specific allele frequency columns
+MAF.coding$Allele.Frequency.African.African.American <- (MAF.coding$Allele.Count.African.African.American/MAF.coding$Allele.Number.African.African.American)
+MAF.coding$Allele.Frequency.Latino.Admixed.American <- (MAF.coding$Allele.Count.Latino.Admixed.American/MAF.coding$Allele.Number.Latino.Admixed.American)
+MAF.coding$Allele.Frequency.Ashkenazi.Jewish <- (MAF.coding$Allele.Count.Ashkenazi.Jewish/MAF.coding$Allele.Number.Ashkenazi.Jewish)
+MAF.coding$Allele.Frequency.East.Asian <- (MAF.coding$Allele.Count.East.Asian/MAF.coding$Allele.Number.East.Asian)
+MAF.coding$Allele.Frequency.European..Finnish. <- (MAF.coding$Allele.Count.European..Finnish./MAF.coding$Allele.Number.European..Finnish.)
+MAF.coding$Allele.Frequency.European..non.Finnish. <- (MAF.coding$Allele.Count.European..non.Finnish./MAF.coding$Allele.Number.European..non.Finnish.)
+MAF.coding$Allele.Frequency.Other <- (MAF.coding$Allele.Count.Other/MAF.coding$Allele.Number.Other)
+MAF.coding$Allele.Frequency.South.Asian <- (MAF.coding$Allele.Count.South.Asian/MAF.coding$Allele.Number.South.Asian)
+
+#Create filtered data frames with ancestry specific rare variants
+All <- MAF.coding %>% filter(Allele.Frequency <= 0.01)
+African <- MAF.coding %>% filter(Allele.Frequency.African.African.American <= 0.01)
+Latino <- MAF.coding %>% filter(Allele.Frequency.Latino.Admixed.American <= 0.01)
+Jewish <- MAF.coding %>% filter(Allele.Frequency.Ashkenazi.Jewish <= 0.01)
+East.Asian <- MAF.coding %>% filter(Allele.Frequency.East.Asian <= 0.01)
+Finnish <- MAF.coding %>% filter(Allele.Frequency.European..Finnish. <= 0.01)
+NFE <- MAF.coding %>% filter(Allele.Frequency.European..non.Finnish. <= 0.01)
+Other <- MAF.coding %>% filter(Allele.Frequency.Other <= 0.01)
+South.Asian <- MAF.coding %>% filter(Allele.Frequency.South.Asian <= 0.01)
+
+##Construct ancestry specific tables, starting with African ancestry table
+#Split data frame by genes and assign new dataframes to objects
+X <- split(African, African$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.African.African.American)
+CARD14.sum <- sum(CARD14$Allele.Count.African.African.American)
+IL1RN.sum <- sum(IL1RN$Allele.Count.African.African.American)
+IL36RN.sum <- sum(IL36RN$Allele.Count.African.African.American)
+LPIN2.sum <- sum(LPIN2$Allele.Count.African.African.American)
+MEFV.sum <- sum(MEFV$Allele.Count.African.African.American)
+MVK.sum <- sum(MVK$Allele.Count.African.African.American)
+NLRC4.sum <- sum(NLRC4$Allele.Count.African.African.American)
+NLRP3.sum <- sum(NLRP3$Allele.Count.African.African.American)
+NLRP12.sum <- sum(NLRP12$Allele.Count.African.African.American)
+NOD2.sum <- sum(NOD2$Allele.Count.African.African.American)
+PLCG2.sum <- sum(PLCG2$Allele.Count.African.African.American)
+PSMB4.sum <- sum(PSMB4$Allele.Count.African.African.American)
+PSMB8.sum <- sum(PSMB8$Allele.Count.African.African.American)
+PSMB9.sum <- sum(PSMB9$Allele.Count.African.African.American)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.African.African.American)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.African.African.American)
+TMEM173.sum <- sum(TMEM173$Allele.Count.African.African.American)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.African.African.American)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.African.African.American)
+OTULIN.sum <- sum(OTULIN$Allele.Count.African.African.American)
+RBCK1.sum <- sum(RBCK1$Allele.Count.African.African.American)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.African.African.American)
+UBA1.sum <- sum(UBA1$Allele.Count.African.African.American)
+
+ADA2.max <- max(ADA2$Allele.Number.African.African.American)
+CARD14.max <- max(CARD14$Allele.Number.African.African.American)
+IL1RN.max <- max(IL1RN$Allele.Number.African.African.American)
+IL36RN.max <- max(IL36RN$Allele.Number.African.African.American)
+LPIN2.max <- max(LPIN2$Allele.Number.African.African.American)
+MEFV.max <- max(MEFV$Allele.Number.African.African.American)
+MVK.max <- max(MVK$Allele.Number.African.African.American)
+NLRC4.max <- max(NLRC4$Allele.Number.African.African.American)
+NLRP3.max <- max(NLRP3$Allele.Number.African.African.American)
+NLRP12.max <- max(NLRP12$Allele.Number.African.African.American)
+NOD2.max <- max(NOD2$Allele.Number.African.African.American)
+PLCG2.max <- max(PLCG2$Allele.Number.African.African.American)
+PSMB4.max <- max(PSMB4$Allele.Number.African.African.American)
+PSMB8.max <- max(PSMB8$Allele.Number.African.African.American)
+PSMB9.max <- max(PSMB9$Allele.Number.African.African.American)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.African.African.American)
+SH3BP2.max <- max(SH3BP2$Allele.Number.African.African.American)
+TMEM173.max <- max(TMEM173$Allele.Number.African.African.American)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.African.African.American)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.African.African.American)
+OTULIN.max <- max(OTULIN$Allele.Number.African.African.American)
+RBCK1.max <- max(RBCK1$Allele.Number.African.African.American)
+SLC29A3.max <- max(SLC29A3$Allele.Number.African.African.American)
+UBA1.max <- max(UBA1$Allele.Number.African.African.American)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+African.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+African.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+African.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+African.table <- data.frame(Gene,African.Sum,African.Max,African.CF)
+
+
+##Construct data rame for Latino
+#Split data frame by genes and assign new dataframes to objects
+X <- split(Latino, Latino$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.Latino.Admixed.American)
+CARD14.sum <- sum(CARD14$Allele.Count.Latino.Admixed.American)
+IL1RN.sum <- sum(IL1RN$Allele.Count.Latino.Admixed.American)
+IL36RN.sum <- sum(IL36RN$Allele.Count.Latino.Admixed.American)
+LPIN2.sum <- sum(LPIN2$Allele.Count.Latino.Admixed.American)
+MEFV.sum <- sum(MEFV$Allele.Count.Latino.Admixed.American)
+MVK.sum <- sum(MVK$Allele.Count.Latino.Admixed.American)
+NLRC4.sum <- sum(NLRC4$Allele.Count.Latino.Admixed.American)
+NLRP3.sum <- sum(NLRP3$Allele.Count.Latino.Admixed.American)
+NLRP12.sum <- sum(NLRP12$Allele.Count.Latino.Admixed.American)
+NOD2.sum <- sum(NOD2$Allele.Count.Latino.Admixed.American)
+PLCG2.sum <- sum(PLCG2$Allele.Count.Latino.Admixed.American)
+PSMB4.sum <- sum(PSMB4$Allele.Count.Latino.Admixed.American)
+PSMB8.sum <- sum(PSMB8$Allele.Count.Latino.Admixed.American)
+PSMB9.sum <- sum(PSMB9$Allele.Count.Latino.Admixed.American)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.Latino.Admixed.American)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.Latino.Admixed.American)
+TMEM173.sum <- sum(TMEM173$Allele.Count.Latino.Admixed.American)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.Latino.Admixed.American)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.Latino.Admixed.American)
+OTULIN.sum <- sum(OTULIN$Allele.Count.Latino.Admixed.American)
+RBCK1.sum <- sum(RBCK1$Allele.Count.Latino.Admixed.American)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.Latino.Admixed.American)
+UBA1.sum <- sum(UBA1$Allele.Count.Latino.Admixed.American)
+
+ADA2.max <- max(ADA2$Allele.Number.Latino.Admixed.American)
+CARD14.max <- max(CARD14$Allele.Number.Latino.Admixed.American)
+IL1RN.max <- max(IL1RN$Allele.Number.Latino.Admixed.American)
+IL36RN.max <- max(IL36RN$Allele.Number.Latino.Admixed.American)
+LPIN2.max <- max(LPIN2$Allele.Number.Latino.Admixed.American)
+MEFV.max <- max(MEFV$Allele.Number.Latino.Admixed.American)
+MVK.max <- max(MVK$Allele.Number.Latino.Admixed.American)
+NLRC4.max <- max(NLRC4$Allele.Number.Latino.Admixed.American)
+NLRP3.max <- max(NLRP3$Allele.Number.Latino.Admixed.American)
+NLRP12.max <- max(NLRP12$Allele.Number.Latino.Admixed.American)
+NOD2.max <- max(NOD2$Allele.Number.Latino.Admixed.American)
+PLCG2.max <- max(PLCG2$Allele.Number.Latino.Admixed.American)
+PSMB4.max <- max(PSMB4$Allele.Number.Latino.Admixed.American)
+PSMB8.max <- max(PSMB8$Allele.Number.Latino.Admixed.American)
+PSMB9.max <- max(PSMB9$Allele.Number.Latino.Admixed.American)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.Latino.Admixed.American)
+SH3BP2.max <- max(SH3BP2$Allele.Number.Latino.Admixed.American)
+TMEM173.max <- max(TMEM173$Allele.Number.Latino.Admixed.American)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.Latino.Admixed.American)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.Latino.Admixed.American)
+OTULIN.max <- max(OTULIN$Allele.Number.Latino.Admixed.American)
+RBCK1.max <- max(RBCK1$Allele.Number.Latino.Admixed.American)
+SLC29A3.max <- max(SLC29A3$Allele.Number.Latino.Admixed.American)
+UBA1.max <- max(UBA1$Allele.Number.Latino.Admixed.American)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+Latino.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+Latino.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+Latino.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+Latino.table <- data.frame(Gene,Latino.Sum,Latino.Max,Latino.CF)
+
+
+##Construct table for Jewish
+#Split data frame by genes and assign new dataframes to objects
+X <- split(Jewish, Jewish$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.Ashkenazi.Jewish)
+CARD14.sum <- sum(CARD14$Allele.Count.Ashkenazi.Jewish)
+IL1RN.sum <- sum(IL1RN$Allele.Count.Ashkenazi.Jewish)
+IL36RN.sum <- sum(IL36RN$Allele.Count.Ashkenazi.Jewish)
+LPIN2.sum <- sum(LPIN2$Allele.Count.Ashkenazi.Jewish)
+MEFV.sum <- sum(MEFV$Allele.Count.Ashkenazi.Jewish)
+MVK.sum <- sum(MVK$Allele.Count.Ashkenazi.Jewish)
+NLRC4.sum <- sum(NLRC4$Allele.Count.Ashkenazi.Jewish)
+NLRP3.sum <- sum(NLRP3$Allele.Count.Ashkenazi.Jewish)
+NLRP12.sum <- sum(NLRP12$Allele.Count.Ashkenazi.Jewish)
+NOD2.sum <- sum(NOD2$Allele.Count.Ashkenazi.Jewish)
+PLCG2.sum <- sum(PLCG2$Allele.Count.Ashkenazi.Jewish)
+PSMB4.sum <- sum(PSMB4$Allele.Count.Ashkenazi.Jewish)
+PSMB8.sum <- sum(PSMB8$Allele.Count.Ashkenazi.Jewish)
+PSMB9.sum <- sum(PSMB9$Allele.Count.Ashkenazi.Jewish)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.Ashkenazi.Jewish)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.Ashkenazi.Jewish)
+TMEM173.sum <- sum(TMEM173$Allele.Count.Ashkenazi.Jewish)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.Ashkenazi.Jewish)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.Ashkenazi.Jewish)
+OTULIN.sum <- sum(OTULIN$Allele.Count.Ashkenazi.Jewish)
+RBCK1.sum <- sum(RBCK1$Allele.Count.Ashkenazi.Jewish)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.Ashkenazi.Jewish)
+UBA1.sum <- sum(UBA1$Allele.Count.Ashkenazi.Jewish)
+
+ADA2.max <- max(ADA2$Allele.Number.Ashkenazi.Jewish)
+CARD14.max <- max(CARD14$Allele.Number.Ashkenazi.Jewish)
+IL1RN.max <- max(IL1RN$Allele.Number.Ashkenazi.Jewish)
+IL36RN.max <- max(IL36RN$Allele.Number.Ashkenazi.Jewish)
+LPIN2.max <- max(LPIN2$Allele.Number.Ashkenazi.Jewish)
+MEFV.max <- max(MEFV$Allele.Number.Ashkenazi.Jewish)
+MVK.max <- max(MVK$Allele.Number.Ashkenazi.Jewish)
+NLRC4.max <- max(NLRC4$Allele.Number.Ashkenazi.Jewish)
+NLRP3.max <- max(NLRP3$Allele.Number.Ashkenazi.Jewish)
+NLRP12.max <- max(NLRP12$Allele.Number.Ashkenazi.Jewish)
+NOD2.max <- max(NOD2$Allele.Number.Ashkenazi.Jewish)
+PLCG2.max <- max(PLCG2$Allele.Number.Ashkenazi.Jewish)
+PSMB4.max <- max(PSMB4$Allele.Number.Ashkenazi.Jewish)
+PSMB8.max <- max(PSMB8$Allele.Number.Ashkenazi.Jewish)
+PSMB9.max <- max(PSMB9$Allele.Number.Ashkenazi.Jewish)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.Ashkenazi.Jewish)
+SH3BP2.max <- max(SH3BP2$Allele.Number.Ashkenazi.Jewish)
+TMEM173.max <- max(TMEM173$Allele.Number.Ashkenazi.Jewish)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.Ashkenazi.Jewish)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.Ashkenazi.Jewish)
+OTULIN.max <- max(OTULIN$Allele.Number.Ashkenazi.Jewish)
+RBCK1.max <- max(RBCK1$Allele.Number.Ashkenazi.Jewish)
+SLC29A3.max <- max(SLC29A3$Allele.Number.Ashkenazi.Jewish)
+UBA1.max <- max(UBA1$Allele.Number.Ashkenazi.Jewish)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+Jewish.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+Jewish.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+Jewish.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+Jewish.table <- data.frame(Gene,Jewish.Sum,Jewish.Max,Jewish.CF)
+
+##Construct table for East ASian
+
+
+#Split data frame by genes and assign new dataframes to objects
+X <- split(East.Asian, East.Asian$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.East.Asian)
+CARD14.sum <- sum(CARD14$Allele.Count.East.Asian)
+IL1RN.sum <- sum(IL1RN$Allele.Count.East.Asian)
+IL36RN.sum <- sum(IL36RN$Allele.Count.East.Asian)
+LPIN2.sum <- sum(LPIN2$Allele.Count.East.Asian)
+MEFV.sum <- sum(MEFV$Allele.Count.East.Asian)
+MVK.sum <- sum(MVK$Allele.Count.East.Asian)
+NLRC4.sum <- sum(NLRC4$Allele.Count.East.Asian)
+NLRP3.sum <- sum(NLRP3$Allele.Count.East.Asian)
+NLRP12.sum <- sum(NLRP12$Allele.Count.East.Asian)
+NOD2.sum <- sum(NOD2$Allele.Count.East.Asian)
+PLCG2.sum <- sum(PLCG2$Allele.Count.East.Asian)
+PSMB4.sum <- sum(PSMB4$Allele.Count.East.Asian)
+PSMB8.sum <- sum(PSMB8$Allele.Count.East.Asian)
+PSMB9.sum <- sum(PSMB9$Allele.Count.East.Asian)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.East.Asian)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.East.Asian)
+TMEM173.sum <- sum(TMEM173$Allele.Count.East.Asian)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.East.Asian)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.East.Asian)
+OTULIN.sum <- sum(OTULIN$Allele.Count.East.Asian)
+RBCK1.sum <- sum(RBCK1$Allele.Count.East.Asian)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.East.Asian)
+UBA1.sum <- sum(UBA1$Allele.Count.East.Asian)
+
+ADA2.max <- max(ADA2$Allele.Number.East.Asian)
+CARD14.max <- max(CARD14$Allele.Number.East.Asian)
+IL1RN.max <- max(IL1RN$Allele.Number.East.Asian)
+IL36RN.max <- max(IL36RN$Allele.Number.East.Asian)
+LPIN2.max <- max(LPIN2$Allele.Number.East.Asian)
+MEFV.max <- max(MEFV$Allele.Number.East.Asian)
+MVK.max <- max(MVK$Allele.Number.East.Asian)
+NLRC4.max <- max(NLRC4$Allele.Number.East.Asian)
+NLRP3.max <- max(NLRP3$Allele.Number.East.Asian)
+NLRP12.max <- max(NLRP12$Allele.Number.East.Asian)
+NOD2.max <- max(NOD2$Allele.Number.East.Asian)
+PLCG2.max <- max(PLCG2$Allele.Number.East.Asian)
+PSMB4.max <- max(PSMB4$Allele.Number.East.Asian)
+PSMB8.max <- max(PSMB8$Allele.Number.East.Asian)
+PSMB9.max <- max(PSMB9$Allele.Number.East.Asian)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.East.Asian)
+SH3BP2.max <- max(SH3BP2$Allele.Number.East.Asian)
+TMEM173.max <- max(TMEM173$Allele.Number.East.Asian)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.East.Asian)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.East.Asian)
+OTULIN.max <- max(OTULIN$Allele.Number.East.Asian)
+RBCK1.max <- max(RBCK1$Allele.Number.East.Asian)
+SLC29A3.max <- max(SLC29A3$Allele.Number.East.Asian)
+UBA1.max <- max(UBA1$Allele.Number.East.Asian)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+East.Asian.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+East.Asian.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+East.Asian.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+East.Asian.table <- data.frame(Gene,East.Asian.Sum,East.Asian.Max,East.Asian.CF)
+
+##Construct table for Finnish
+#Split data frame by genes and assign new dataframes to objects
+X <- split(Finnish, Finnish$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.European..Finnish.)
+CARD14.sum <- sum(CARD14$Allele.Count.European..Finnish.)
+IL1RN.sum <- sum(IL1RN$Allele.Count.European..Finnish.)
+IL36RN.sum <- sum(IL36RN$Allele.Count.European..Finnish.)
+LPIN2.sum <- sum(LPIN2$Allele.Count.European..Finnish.)
+MEFV.sum <- sum(MEFV$Allele.Count.European..Finnish.)
+MVK.sum <- sum(MVK$Allele.Count.European..Finnish.)
+NLRC4.sum <- sum(NLRC4$Allele.Count.European..Finnish.)
+NLRP3.sum <- sum(NLRP3$Allele.Count.European..Finnish.)
+NLRP12.sum <- sum(NLRP12$Allele.Count.European..Finnish.)
+NOD2.sum <- sum(NOD2$Allele.Count.European..Finnish.)
+PLCG2.sum <- sum(PLCG2$Allele.Count.European..Finnish.)
+PSMB4.sum <- sum(PSMB4$Allele.Count.European..Finnish.)
+PSMB8.sum <- sum(PSMB8$Allele.Count.European..Finnish.)
+PSMB9.sum <- sum(PSMB9$Allele.Count.European..Finnish.)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.European..Finnish.)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.European..Finnish.)
+TMEM173.sum <- sum(TMEM173$Allele.Count.European..Finnish.)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.European..Finnish.)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.European..Finnish.)
+OTULIN.sum <- sum(OTULIN$Allele.Count.European..Finnish.)
+RBCK1.sum <- sum(RBCK1$Allele.Count.European..Finnish.)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.European..Finnish.)
+UBA1.sum <- sum(UBA1$Allele.Count.European..Finnish.)
+
+ADA2.max <- max(ADA2$Allele.Number.European..Finnish.)
+CARD14.max <- max(CARD14$Allele.Number.European..Finnish.)
+IL1RN.max <- max(IL1RN$Allele.Number.European..Finnish.)
+IL36RN.max <- max(IL36RN$Allele.Number.European..Finnish.)
+LPIN2.max <- max(LPIN2$Allele.Number.European..Finnish.)
+MEFV.max <- max(MEFV$Allele.Number.European..Finnish.)
+MVK.max <- max(MVK$Allele.Number.European..Finnish.)
+NLRC4.max <- max(NLRC4$Allele.Number.European..Finnish.)
+NLRP3.max <- max(NLRP3$Allele.Number.European..Finnish.)
+NLRP12.max <- max(NLRP12$Allele.Number.European..Finnish.)
+NOD2.max <- max(NOD2$Allele.Number.European..Finnish.)
+PLCG2.max <- max(PLCG2$Allele.Number.European..Finnish.)
+PSMB4.max <- max(PSMB4$Allele.Number.European..Finnish.)
+PSMB8.max <- max(PSMB8$Allele.Number.European..Finnish.)
+PSMB9.max <- max(PSMB9$Allele.Number.European..Finnish.)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.European..Finnish.)
+SH3BP2.max <- max(SH3BP2$Allele.Number.European..Finnish.)
+TMEM173.max <- max(TMEM173$Allele.Number.European..Finnish.)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.European..Finnish.)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.European..Finnish.)
+OTULIN.max <- max(OTULIN$Allele.Number.European..Finnish.)
+RBCK1.max <- max(RBCK1$Allele.Number.European..Finnish.)
+SLC29A3.max <- max(SLC29A3$Allele.Number.European..Finnish.)
+UBA1.max <- max(UBA1$Allele.Number.European..Finnish.)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+Finnish.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+Finnish.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+Finnish.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+Finnish.table <- data.frame(Gene,Finnish.Sum,Finnish.Max,Finnish.CF)
+
+##Construct table for NFE
+
+
+#Split data frame by genes and assign new dataframes to objects
+X <- split(NFE, NFE$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.European..non.Finnish.)
+CARD14.sum <- sum(CARD14$Allele.Count.European..non.Finnish.)
+IL1RN.sum <- sum(IL1RN$Allele.Count.European..non.Finnish.)
+IL36RN.sum <- sum(IL36RN$Allele.Count.European..non.Finnish.)
+LPIN2.sum <- sum(LPIN2$Allele.Count.European..non.Finnish.)
+MEFV.sum <- sum(MEFV$Allele.Count.European..non.Finnish.)
+MVK.sum <- sum(MVK$Allele.Count.European..non.Finnish.)
+NLRC4.sum <- sum(NLRC4$Allele.Count.European..non.Finnish.)
+NLRP3.sum <- sum(NLRP3$Allele.Count.European..non.Finnish.)
+NLRP12.sum <- sum(NLRP12$Allele.Count.European..non.Finnish.)
+NOD2.sum <- sum(NOD2$Allele.Count.European..non.Finnish.)
+PLCG2.sum <- sum(PLCG2$Allele.Count.European..non.Finnish.)
+PSMB4.sum <- sum(PSMB4$Allele.Count.European..non.Finnish.)
+PSMB8.sum <- sum(PSMB8$Allele.Count.European..non.Finnish.)
+PSMB9.sum <- sum(PSMB9$Allele.Count.European..non.Finnish.)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.European..non.Finnish.)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.European..non.Finnish.)
+TMEM173.sum <- sum(TMEM173$Allele.Count.European..non.Finnish.)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.European..non.Finnish.)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.European..non.Finnish.)
+OTULIN.sum <- sum(OTULIN$Allele.Count.European..non.Finnish.)
+RBCK1.sum <- sum(RBCK1$Allele.Count.European..non.Finnish.)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.European..non.Finnish.)
+UBA1.sum <- sum(UBA1$Allele.Count.European..non.Finnish.)
+
+ADA2.max <- max(ADA2$Allele.Number.European..non.Finnish.)
+CARD14.max <- max(CARD14$Allele.Number.European..non.Finnish.)
+IL1RN.max <- max(IL1RN$Allele.Number.European..non.Finnish.)
+IL36RN.max <- max(IL36RN$Allele.Number.European..non.Finnish.)
+LPIN2.max <- max(LPIN2$Allele.Number.European..non.Finnish.)
+MEFV.max <- max(MEFV$Allele.Number.European..non.Finnish.)
+MVK.max <- max(MVK$Allele.Number.European..non.Finnish.)
+NLRC4.max <- max(NLRC4$Allele.Number.European..non.Finnish.)
+NLRP3.max <- max(NLRP3$Allele.Number.European..non.Finnish.)
+NLRP12.max <- max(NLRP12$Allele.Number.European..non.Finnish.)
+NOD2.max <- max(NOD2$Allele.Number.European..non.Finnish.)
+PLCG2.max <- max(PLCG2$Allele.Number.European..non.Finnish.)
+PSMB4.max <- max(PSMB4$Allele.Number.European..non.Finnish.)
+PSMB8.max <- max(PSMB8$Allele.Number.European..non.Finnish.)
+PSMB9.max <- max(PSMB9$Allele.Number.European..non.Finnish.)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.European..non.Finnish.)
+SH3BP2.max <- max(SH3BP2$Allele.Number.European..non.Finnish.)
+TMEM173.max <- max(TMEM173$Allele.Number.European..non.Finnish.)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.European..non.Finnish.)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.European..non.Finnish.)
+OTULIN.max <- max(OTULIN$Allele.Number.European..non.Finnish.)
+RBCK1.max <- max(RBCK1$Allele.Number.European..non.Finnish.)
+SLC29A3.max <- max(SLC29A3$Allele.Number.European..non.Finnish.)
+UBA1.max <- max(UBA1$Allele.Number.European..non.Finnish.)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+NFE.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+NFE.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+NFE.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+NFE.table <- data.frame(Gene,NFE.Sum,NFE.Max,NFE.CF)
+
+##Construct South Asian data frame
+
+
+#Split data frame by genes and assign new dataframes to objects
+X <- split(South.Asian, South.Asian$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.South.Asian)
+CARD14.sum <- sum(CARD14$Allele.Count.South.Asian)
+IL1RN.sum <- sum(IL1RN$Allele.Count.South.Asian)
+IL36RN.sum <- sum(IL36RN$Allele.Count.South.Asian)
+LPIN2.sum <- sum(LPIN2$Allele.Count.South.Asian)
+MEFV.sum <- sum(MEFV$Allele.Count.South.Asian)
+MVK.sum <- sum(MVK$Allele.Count.South.Asian)
+NLRC4.sum <- sum(NLRC4$Allele.Count.South.Asian)
+NLRP3.sum <- sum(NLRP3$Allele.Count.South.Asian)
+NLRP12.sum <- sum(NLRP12$Allele.Count.South.Asian)
+NOD2.sum <- sum(NOD2$Allele.Count.South.Asian)
+PLCG2.sum <- sum(PLCG2$Allele.Count.South.Asian)
+PSMB4.sum <- sum(PSMB4$Allele.Count.South.Asian)
+PSMB8.sum <- sum(PSMB8$Allele.Count.South.Asian)
+PSMB9.sum <- sum(PSMB9$Allele.Count.South.Asian)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.South.Asian)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.South.Asian)
+TMEM173.sum <- sum(TMEM173$Allele.Count.South.Asian)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.South.Asian)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.South.Asian)
+OTULIN.sum <- sum(OTULIN$Allele.Count.South.Asian)
+RBCK1.sum <- sum(RBCK1$Allele.Count.South.Asian)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.South.Asian)
+UBA1.sum <- sum(UBA1$Allele.Count.South.Asian)
+
+ADA2.max <- max(ADA2$Allele.Number.South.Asian)
+CARD14.max <- max(CARD14$Allele.Number.South.Asian)
+IL1RN.max <- max(IL1RN$Allele.Number.South.Asian)
+IL36RN.max <- max(IL36RN$Allele.Number.South.Asian)
+LPIN2.max <- max(LPIN2$Allele.Number.South.Asian)
+MEFV.max <- max(MEFV$Allele.Number.South.Asian)
+MVK.max <- max(MVK$Allele.Number.South.Asian)
+NLRC4.max <- max(NLRC4$Allele.Number.South.Asian)
+NLRP3.max <- max(NLRP3$Allele.Number.South.Asian)
+NLRP12.max <- max(NLRP12$Allele.Number.South.Asian)
+NOD2.max <- max(NOD2$Allele.Number.South.Asian)
+PLCG2.max <- max(PLCG2$Allele.Number.South.Asian)
+PSMB4.max <- max(PSMB4$Allele.Number.South.Asian)
+PSMB8.max <- max(PSMB8$Allele.Number.South.Asian)
+PSMB9.max <- max(PSMB9$Allele.Number.South.Asian)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.South.Asian)
+SH3BP2.max <- max(SH3BP2$Allele.Number.South.Asian)
+TMEM173.max <- max(TMEM173$Allele.Number.South.Asian)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.South.Asian)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.South.Asian)
+OTULIN.max <- max(OTULIN$Allele.Number.South.Asian)
+RBCK1.max <- max(RBCK1$Allele.Number.South.Asian)
+SLC29A3.max <- max(SLC29A3$Allele.Number.South.Asian)
+UBA1.max <- max(UBA1$Allele.Number.South.Asian)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+South.Asian.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+South.Asian.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+South.Asian.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+South.Asian.table <- data.frame(Gene,South.Asian.Sum,South.Asian.Max,South.Asian.CF)
+
+##Construct other table
+
+
+#Split data frame by genes and assign new dataframes to objects
+X <- split(Other, Other$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count.Other)
+CARD14.sum <- sum(CARD14$Allele.Count.Other)
+IL1RN.sum <- sum(IL1RN$Allele.Count.Other)
+IL36RN.sum <- sum(IL36RN$Allele.Count.Other)
+LPIN2.sum <- sum(LPIN2$Allele.Count.Other)
+MEFV.sum <- sum(MEFV$Allele.Count.Other)
+MVK.sum <- sum(MVK$Allele.Count.Other)
+NLRC4.sum <- sum(NLRC4$Allele.Count.Other)
+NLRP3.sum <- sum(NLRP3$Allele.Count.Other)
+NLRP12.sum <- sum(NLRP12$Allele.Count.Other)
+NOD2.sum <- sum(NOD2$Allele.Count.Other)
+PLCG2.sum <- sum(PLCG2$Allele.Count.Other)
+PSMB4.sum <- sum(PSMB4$Allele.Count.Other)
+PSMB8.sum <- sum(PSMB8$Allele.Count.Other)
+PSMB9.sum <- sum(PSMB9$Allele.Count.Other)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count.Other)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count.Other)
+TMEM173.sum <- sum(TMEM173$Allele.Count.Other)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count.Other)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count.Other)
+OTULIN.sum <- sum(OTULIN$Allele.Count.Other)
+RBCK1.sum <- sum(RBCK1$Allele.Count.Other)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count.Other)
+UBA1.sum <- sum(UBA1$Allele.Count.Other)
+
+ADA2.max <- max(ADA2$Allele.Number.Other)
+CARD14.max <- max(CARD14$Allele.Number.Other)
+IL1RN.max <- max(IL1RN$Allele.Number.Other)
+IL36RN.max <- max(IL36RN$Allele.Number.Other)
+LPIN2.max <- max(LPIN2$Allele.Number.Other)
+MEFV.max <- max(MEFV$Allele.Number.Other)
+MVK.max <- max(MVK$Allele.Number.Other)
+NLRC4.max <- max(NLRC4$Allele.Number.Other)
+NLRP3.max <- max(NLRP3$Allele.Number.Other)
+NLRP12.max <- max(NLRP12$Allele.Number.Other)
+NOD2.max <- max(NOD2$Allele.Number.Other)
+PLCG2.max <- max(PLCG2$Allele.Number.Other)
+PSMB4.max <- max(PSMB4$Allele.Number.Other)
+PSMB8.max <- max(PSMB8$Allele.Number.Other)
+PSMB9.max <- max(PSMB9$Allele.Number.Other)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number.Other)
+SH3BP2.max <- max(SH3BP2$Allele.Number.Other)
+TMEM173.max <- max(TMEM173$Allele.Number.Other)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number.Other)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number.Other)
+OTULIN.max <- max(OTULIN$Allele.Number.Other)
+RBCK1.max <- max(RBCK1$Allele.Number.Other)
+SLC29A3.max <- max(SLC29A3$Allele.Number.Other)
+UBA1.max <- max(UBA1$Allele.Number.Other)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+Other.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+Other.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+Other.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+Other.table <- data.frame(Gene,Other.Sum,Other.Max,Other.CF)
+
+##Construct all ethnicity table
+
+
+#Split data frame by genes and assign new dataframes to objects
+X <- split(All, All$Gene)
+ADA2 <- X$ADA2
+CARD14 <- X$CARD14
+IL1RN <- X$IL1RN
+IL36RN <- X$IL36RN
+LPIN2 <- X$LPIN2
+MEFV <- X$MEFV
+MVK <- X$MVK
+NLRC4 <- X$NLRC4
+NLRP3 <- X$NLRP3
+NLRP12 <- X$NLRP12
+NOD2 <- X$NOD2
+PLCG2 <- X$PLCG2
+PSMB4 <- X$PSMB4
+PSMB8 <- X$PSMB8
+PSMB9 <- X$PSMB9
+PSTPIP1 <- X$PSTPIP1
+SH3BP2 <- X$SH3BP2
+TMEM173 <- X$TMEM173
+TNFAIP3 <- X$TNFAIP3
+TNFRSF1A <- X$TNFRSF1A
+OTULIN <- X$OTULIN
+RBCK1 <- X$RBCK1
+SLC29A3 <- X$SLC29A3
+UBA1 <- X$UBA1
+
+#Combined frequency calculations
+ADA2.sum <- sum(ADA2$Allele.Count)
+CARD14.sum <- sum(CARD14$Allele.Count)
+IL1RN.sum <- sum(IL1RN$Allele.Count)
+IL36RN.sum <- sum(IL36RN$Allele.Count)
+LPIN2.sum <- sum(LPIN2$Allele.Count)
+MEFV.sum <- sum(MEFV$Allele.Count)
+MVK.sum <- sum(MVK$Allele.Count)
+NLRC4.sum <- sum(NLRC4$Allele.Count)
+NLRP3.sum <- sum(NLRP3$Allele.Count)
+NLRP12.sum <- sum(NLRP12$Allele.Count)
+NOD2.sum <- sum(NOD2$Allele.Count)
+PLCG2.sum <- sum(PLCG2$Allele.Count)
+PSMB4.sum <- sum(PSMB4$Allele.Count)
+PSMB8.sum <- sum(PSMB8$Allele.Count)
+PSMB9.sum <- sum(PSMB9$Allele.Count)
+PSTPIP1.sum <- sum(PSTPIP1$Allele.Count)
+SH3BP2.sum <- sum(SH3BP2$Allele.Count)
+TMEM173.sum <- sum(TMEM173$Allele.Count)
+TNFAIP3.sum <- sum(TNFAIP3$Allele.Count)
+TNFRSF1A.sum <- sum(TNFRSF1A$Allele.Count)
+OTULIN.sum <- sum(OTULIN$Allele.Count)
+RBCK1.sum <- sum(RBCK1$Allele.Count)
+SLC29A3.sum <- sum(SLC29A3$Allele.Count)
+UBA1.sum <- sum(UBA1$Allele.Count)
+
+ADA2.max <- max(ADA2$Allele.Number)
+CARD14.max <- max(CARD14$Allele.Number)
+IL1RN.max <- max(IL1RN$Allele.Number)
+IL36RN.max <- max(IL36RN$Allele.Number)
+LPIN2.max <- max(LPIN2$Allele.Number)
+MEFV.max <- max(MEFV$Allele.Number)
+MVK.max <- max(MVK$Allele.Number)
+NLRC4.max <- max(NLRC4$Allele.Number)
+NLRP3.max <- max(NLRP3$Allele.Number)
+NLRP12.max <- max(NLRP12$Allele.Number)
+NOD2.max <- max(NOD2$Allele.Number)
+PLCG2.max <- max(PLCG2$Allele.Number)
+PSMB4.max <- max(PSMB4$Allele.Number)
+PSMB8.max <- max(PSMB8$Allele.Number)
+PSMB9.max <- max(PSMB9$Allele.Number)
+PSTPIP1.max <- max(PSTPIP1$Allele.Number)
+SH3BP2.max <- max(SH3BP2$Allele.Number)
+TMEM173.max <- max(TMEM173$Allele.Number)
+TNFAIP3.max <- max(TNFAIP3$Allele.Number)
+TNFRSF1A.max <- max(TNFRSF1A$Allele.Number)
+OTULIN.max <- max(OTULIN$Allele.Number)
+RBCK1.max <- max(RBCK1$Allele.Number)
+SLC29A3.max <- max(SLC29A3$Allele.Number)
+UBA1.max <- max(UBA1$Allele.Number)
+
+ADA2.CF <- ADA2.sum/ADA2.max 
+CARD14.CF <- CARD14.sum/CARD14.max
+IL1RN.CF <- IL1RN.sum/IL1RN.max
+IL36RN.CF <- IL36RN.sum/IL36RN.max
+LPIN2.CF <- LPIN2.sum/LPIN2.max
+MEFV.CF <- MEFV.sum/MEFV.max 
+MVK.CF <- MVK.sum/MVK.max
+NLRC4.CF <- NLRC4.sum/NLRC4.max
+NLRP3.CF <- NLRP3.sum/NLRP3.max
+NLRP12.CF <- NLRP12.sum/NLRP12.max
+NOD2.CF <- NOD2.sum/NOD2.max
+PLCG2.CF <- PLCG2.sum/PLCG2.max
+PSMB4.CF <- PSMB4.sum/PSMB4.max
+PSMB8.CF <- PSMB8.sum/PSMB8.max
+PSMB9.CF <- PSMB9.sum/PSMB9.max
+PSTPIP1.CF <- PSTPIP1.sum/PSTPIP1.max
+SH3BP2.CF <- SH3BP2.sum/SH3BP2.max
+TMEM173.CF <- TMEM173.sum/TMEM173.max
+TNFAIP3.CF <- TNFAIP3.sum/TNFAIP3.max
+TNFRSF1A.CF <- TNFRSF1A.sum/TNFRSF1A.max
+OTULIN.CF <- OTULIN.sum/OTULIN.max
+RBCK1.CF <- RBCK1.sum/RBCK1.max
+SLC29A3.CF <- SLC29A3.sum/SLC29A3.max
+UBA1.CF <- UBA1.sum/UBA1.max
+
+#Construct data frame
+Gene <- c('ADA2','CARD14','IL1RN','IL36RN','LPIN2','MEFV','MVK','NLRC4','NLRP3','NLRP12','NOD2','PLCG2','PSMB4','PSMB8','PSMB9','PSTPIP1','SH3BP2','TMEM173','TNFAIP3','TNFRSF1A', 'OTULIN','RBCK1','SLC29A3','UBA1')
+All.Sum <-c(ADA2.sum,CARD14.sum,IL1RN.sum,IL36RN.sum,LPIN2.sum,MEFV.sum,MVK.sum,NLRC4.sum,NLRP3.sum,NLRP12.sum,NOD2.sum,PLCG2.sum,PSMB4.sum,PSMB8.sum,PSMB9.sum,PSTPIP1.sum,SH3BP2.sum,TMEM173.sum,TNFAIP3.sum,TNFRSF1A.sum,OTULIN.sum, RBCK1.sum, SLC29A3.sum, UBA1.sum)
+All.Max <-c(ADA2.max,CARD14.max,IL1RN.max,IL36RN.max,LPIN2.max,MEFV.max,MVK.max,NLRC4.max,NLRP3.max,NLRP12.max,NOD2.max,PLCG2.max,PSMB4.max,PSMB8.max,PSMB9.max,PSTPIP1.max,SH3BP2.max,TMEM173.max,TNFAIP3.max,TNFRSF1A.max, OTULIN.max, RBCK1.max, SLC29A3.max, UBA1.max)
+All.CF <-c(ADA2.CF,CARD14.CF,IL1RN.CF,IL36RN.CF,LPIN2.CF,MEFV.CF,MVK.CF,NLRC4.CF,NLRP3.CF,NLRP12.CF,NOD2.CF,PLCG2.CF,PSMB4.CF,PSMB8.CF,PSMB9.CF,PSTPIP1.CF,SH3BP2.CF,TMEM173.CF,TNFAIP3.CF,TNFRSF1A.CF, OTULIN.CF, RBCK1.CF, SLC29A3.CF, UBA1.CF) 
+All.table <- data.frame(Gene,All.Sum,All.Max,All.CF)
+
+combined <- Reduce(function(x,y) merge(x = x, y = y, by = "Gene"), list(All.table, African.table, Latino.table,Jewish.table,East.Asian.table,Finnish.table,NFE.table,South.Asian.table,Other.table))
+write.csv(combined,"{desiredfilenameanddirectory}")
